@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda436a9c8bbd4d109478acf25cd48d8, type: 3}
+  m_Name: FacilityColorPalette
+  m_EditorClassIdentifier: 
+  m_Colors:
+  - {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
+  - {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
+  - {r: 0.3679245, g: 0.3679245, b: 0.3679245, a: 1}
+  - {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 1}
+  - {r: 0.7264151, g: 0.5129846, b: 0.35978106, a: 1}
+  - {r: 0.4811321, g: 0, b: 0, a: 1}
+  - {r: 0.8867924, g: 0.2438185, b: 0.12967247, a: 1}
+  - {r: 0.8584906, g: 0.69626486, b: 0.2794144, a: 1}
+  - {r: 0.28421438, g: 0.4056604, b: 0.2774564, a: 1}
+  - {r: 0.4406009, g: 0.6603774, b: 0.3270737, a: 1}
+  - {r: 0.4481132, g: 0.9195522, b: 1, a: 1}
