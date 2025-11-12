@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, Interaction.IInteractor
 {
-    // --- Movement and Speed Settings (Optimized Names) ---
+    // --- Movement and Speed Settings ---
     // The force/acceleration applied when moving. Higher value means quicker acceleration.
     public float accelerationFactor = 10f;
 
@@ -25,6 +25,10 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     // This will show up in the Inspector and track our current horizontal speed.
     [SerializeField]
     private float currentHorizontalSpeed = 0f;
+
+    // --- Public Status for PlayerTemperature ---
+    public bool IsMoving { get; private set; } = false;
+    public bool IsRunning { get; private set; } = false;
 
     // General settings
     public float interactiveRange = 5f;
@@ -140,13 +144,14 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     private void movePlayer()
     {
         // --- Determine Current Speed Limits and Acceleration ---
-        bool isRunning = runAction != null && runAction.IsPressed();
+        IsRunning = runAction != null && runAction.IsPressed(); // 更新 IsRunning 属性
 
-        float currentMaxSpeed = isRunning ? runSpeed : walkSpeed;
+        float currentMaxSpeed = IsRunning ? runSpeed : walkSpeed;
         float currentAcceleration = accelerationFactor;
 
         // --- Movement Application ---
         Vector2 direction = playerInput.actions["Move"].ReadValue<Vector2>().normalized;
+        IsMoving = direction.magnitude > 0.1f; // 更新 IsMoving 属性
 
         Vector3 acceleration = transform.right * direction.x * currentAcceleration + transform.forward * direction.y * currentAcceleration;
 

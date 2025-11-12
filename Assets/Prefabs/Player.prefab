@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2246045859130836714}
   - component: {fileID: 8343538448247036242}
+  - component: {fileID: 809305505556565679}
+  - component: {fileID: 2997069342093682980}
   - component: {fileID: 1175625738350851585}
   - component: {fileID: 4454460447813500290}
   - component: {fileID: 6480329822345755669}
@@ -51,9 +53,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cddb9fa173c46548b09dc875172ee6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accelerationFactor: 10
-  walkSpeed: 2
-  runSpeed: 4
+  accelerationFactor: 5
+  walkSpeed: 1
+  runSpeed: 3
   lookSensitivityX: 10
   lookSensitivityY: 10
   currentHorizontalSpeed: 0
@@ -67,6 +69,41 @@ MonoBehaviour:
   proneHeightRatio: 0.25
   auxiliarCamera: {fileID: 0}
   eye: {fileID: 8462408374917084751}
+--- !u!114 &809305505556565679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587358664878436803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 890301bcecdbee5439aac2c90bfe1524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTemperature
+  currentTemperature: 34
+  minTemperature: 34
+  maxTemperature: 38
+  isHoldingIcepack: 0
+  tempChangeStandStill: -0.1
+  tempGainMoving: 0
+  tempGainRunning: 0.2
+  tempChangeIcepackModifier: -0.2
+--- !u!114 &2997069342093682980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587358664878436803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc3ed5a40a9238c4dac134bc578be187, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IcePackController
+  icePackCount: 3
+  icePackDuration: 10
+  currentIcePackTimeLeft: 0
 --- !u!54 &1175625738350851585
 Rigidbody:
   m_ObjectHideFlags: 0
