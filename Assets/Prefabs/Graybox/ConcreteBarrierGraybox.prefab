@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1376094904241313489}
   - component: {fileID: 118855796640416402}
   - component: {fileID: 6358455379127864526}
+  - component: {fileID: 7489778958043321452}
   m_Layer: 6
   m_Name: ConcreteBarrierGraybox
   m_TagString: Untagged
@@ -715,3 +716,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.0000095, y: 1, z: 0.39260674}
   m_Center: {x: 0.50000477, y: 0, z: 0}
+--- !u!114 &7489778958043321452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312518267719711778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
