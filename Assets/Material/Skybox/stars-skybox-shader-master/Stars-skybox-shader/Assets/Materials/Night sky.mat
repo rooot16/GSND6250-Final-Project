@@ -72,8 +72,8 @@ Material:
     - _BrightnessMod: 3.07
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _Density: 1.5
-    - _DensityMod: 1.97
+    - _Density: 2.3
+    - _DensityMod: 2.19
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnableBackgroundNoise: 1
@@ -107,6 +107,6 @@ Material:
     - _NoiseParams: {r: 0.75, g: 6, b: 0.795, a: 2.08}
     - _SkyColor: {r: 0.0027411864, g: 0.07121229, b: 0.13207549, a: 1}
     - _SkyFogColor: {r: 0.0076966705, g: 0.16652901, b: 0.17735851, a: 1}
-    - _StarSizeRange: {r: 0.4, g: 0.52089894, b: 0, a: 0}
+    - _StarSizeRange: {r: 0.46427688, g: 0.58517575, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
