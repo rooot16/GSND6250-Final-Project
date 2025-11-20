@@ -5,10 +5,11 @@ public class PlayerTemperature : MonoBehaviour
     // --- Inspector Settings ---
     [Header("Temperature Monitoring")]
     [SerializeField]
-    private float currentTemperature = 34f;
+    private float currentTemperature = 36f;
 
     [Header("Boundary and State")]
-    public float minTemperature = 34f;
+    public float minTemperatureWithIcePack = 34f;
+    public float minTemperature = 36f;
     public float maxTemperature = 38f;
     public bool isHoldingIcepack = false;
 
@@ -66,7 +67,16 @@ public class PlayerTemperature : MonoBehaviour
 
         // 3. Apply the change and make sure it stays between min and max.
         currentTemperature += finalChangePerSecond * Time.fixedDeltaTime;
-        currentTemperature = Mathf.Clamp(currentTemperature, minTemperature, maxTemperature);
+ 
+        if (isHoldingIcepack)
+        {
+            currentTemperature = Mathf.Clamp(currentTemperature, minTemperatureWithIcePack, maxTemperature);
+        }
+        else
+        {
+            currentTemperature = Mathf.Clamp(currentTemperature, minTemperature, maxTemperature);
+        }
+
     }
 
     // for Zombies scripts to check the current temperature.
