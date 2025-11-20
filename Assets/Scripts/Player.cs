@@ -44,6 +44,40 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public Transform startingPoint; // StartingPoint
     public Image blackScreenImage;  // black Image 
 
+    // --- ✨ 新增: Turret 视野检测状态 ✨ ---
+    [Header("Turret Detection Status")]
+    [Tooltip("当前视野内有多少个 Turret 正在看着玩家 (纯视野，不计温度)。")]
+    [SerializeField]
+    private int turretsSeeingMe = 0;
+
+    // 暴露给 Inspector/其他脚本的最终状态 (玩家被任何一个 Turret 看到)
+    public bool IsVisibleToTurret
+    {
+        get { return turretsSeeingMe > 0; }
+    }
+
+    /// <summary>
+    /// 被 Turret 调用，用于更新玩家的被检测状态计数器。
+    /// </summary>
+    /// <param name="isNowVisible">该 Turret 是否正在看着玩家 (IsTargetVisible)。</param>
+    public void UpdateTurretVisibility(bool isNowVisible)
+    {
+        if (isNowVisible)
+        {
+            turretsSeeingMe++;
+        }
+        else
+        {
+            // 确保计数器不会减到负数
+            if (turretsSeeingMe > 0)
+            {
+                turretsSeeingMe--;
+            }
+        }
+    }
+    // ------------------------------------------
+
+
     private bool isInputLocked = false;
 
     // Private stuff for tracking state and inputs
@@ -169,7 +203,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     // turret detected respawn sequence
     public void TriggerRespawnSequence()
     {
-        if (!isInputLocked) 
+        if (!isInputLocked)
         {
             StartCoroutine(RespawnRoutine());
         }

@@ -31,6 +31,10 @@ public class TurretViewDetector : MonoBehaviour
     [Tooltip("The material to use when the player IS detected.")]
     public Material detectedMaterial;
 
+    // --- ✨ 新增: Turret 自身状态跟踪 ✨ ---
+    // 用于判断视野状态是否发生变化，避免每帧都通知 Player
+    private bool wasPlayerVisibleLastFrame = false;
+    // ---------------------------------------
 
     void Awake()
     {
@@ -59,22 +63,34 @@ public class TurretViewDetector : MonoBehaviour
 
     void Update()
     {
-        // 1. Player
+        // 1. Player 视野检测 (纯视野，不计温度)
+        bool isCurrentlyVisible = IsTargetVisible(playerTarget);
+
+        // 【修改点 1: 通知 Player 状态变化】
+        if (isCurrentlyVisible != wasPlayerVisibleLastFrame)
+        {
+            if (playerScript != null)
+            {
+                playerScript.UpdateTurretVisibility(isCurrentlyVisible);
+            }
+            wasPlayerVisibleLastFrame = isCurrentlyVisible; // 更新 Turret 自身的内部状态
+        }
+
         CheckPlayerLogic();
 
         // 2. Zombies
         CheckZombieLogic();
 
-        // 可视化网格颜色控制
-        bool isPlayerSeen = IsTargetVisible(playerTarget) && IsPlayerHotEnough();
+        // 可视化网格颜色和材质控制: Player可见且温度达标才算真正 "Seen"
+        bool isPlayerSeen = isCurrentlyVisible && IsPlayerHotEnough();
 
         if (viewMeshRenderer != null)
         {
             viewMeshRenderer.enabled = true;
 
+            // 材质切换逻辑
             if (isPlayerSeen)
             {
-                // 如果检测到 Player
                 if (detectedMaterial != null && viewMeshRenderer.material != detectedMaterial)
                 {
                     viewMeshRenderer.material = detectedMaterial;
@@ -82,13 +98,13 @@ public class TurretViewDetector : MonoBehaviour
             }
             else
             {
-                // 如果未检测到 Player
                 if (defaultMaterial != null && viewMeshRenderer.material != defaultMaterial)
                 {
                     viewMeshRenderer.material = defaultMaterial;
                 }
             }
 
+            // 颜色淡入淡出（如果材质支持颜色属性）
             Color targetColor = isPlayerSeen ? Color.red : new Color(1f, 1f, 0f, 0.2f);
             if (viewMeshRenderer.material != null && viewMeshRenderer.material.HasProperty("_Color"))
             {

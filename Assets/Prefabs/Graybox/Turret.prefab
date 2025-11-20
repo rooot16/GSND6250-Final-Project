@@ -8031,7 +8031,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TurretViewDetector
   viewDistance: 5
   viewAngle: 15
-  minDetectionTemperature: 37
+  minDetectionTemperature: 34.2
   playerTarget: {fileID: 0}
   obstacleMask:
     serializedVersion: 2
