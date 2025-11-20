@@ -9,13 +9,8 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour, Interaction.IInteractor
 {
     // --- Movement and Speed Settings ---
-    // The force/acceleration applied when moving. Higher value means quicker acceleration.
     public float accelerationFactor = 10f;
-
-    // The actual speed limit when walking.
     public float walkSpeed = 2f;
-
-    // The actual speed limit when sprinting.
     public float runSpeed = 4f;
 
     // Look sensitivity
@@ -23,7 +18,6 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public float lookSensitivityY = 10f;
 
     // --- Monitoring ---
-    // This will show up in the Inspector and track our current horizontal speed.
     [SerializeField]
     private float currentHorizontalSpeed = 0f;
 
@@ -44,39 +38,34 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public Transform startingPoint; // StartingPoint
     public Image blackScreenImage;  // black Image 
 
-    // --- ✨ 新增: Turret 视野检测状态 ✨ ---
     [Header("Turret Detection Status")]
     [Tooltip("当前视野内有多少个 Turret 正在看着玩家 (纯视野，不计温度)。")]
     [SerializeField]
     private int turretsSeeingMe = 0;
 
-    // 暴露给 Inspector/其他脚本的最终状态 (玩家被任何一个 Turret 看到)
     public bool IsVisibleToTurret
     {
         get { return turretsSeeingMe > 0; }
     }
 
-    /// <summary>
-    /// 被 Turret 调用，用于更新玩家的被检测状态计数器。
-    /// </summary>
-    /// <param name="isNowVisible">该 Turret 是否正在看着玩家 (IsTargetVisible)。</param>
     public void UpdateTurretVisibility(bool isNowVisible)
     {
+        Debug.Log($"PLAYER LOG: UpdateTurretVisibility called. State: {isNowVisible}. Current Count: {turretsSeeingMe}");
+
         if (isNowVisible)
         {
             turretsSeeingMe++;
         }
         else
         {
-            // 确保计数器不会减到负数
             if (turretsSeeingMe > 0)
             {
                 turretsSeeingMe--;
             }
         }
-    }
-    // ------------------------------------------
 
+        Debug.Log($"PLAYER LOG: New Count: {turretsSeeingMe}");
+    }
 
     private bool isInputLocked = false;
 
@@ -121,9 +110,16 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         Cursor.visible = false;
 
         _rigidbody = GetComponent<Rigidbody>();
-
         playerInput = GetComponent<PlayerInput>();
-        playerHeight = transform.Find("Body").gameObject.GetComponent<CapsuleCollider>().height;
+
+        if (transform.Find("Body") != null)
+        {
+            playerHeight = transform.Find("Body").gameObject.GetComponent<CapsuleCollider>().height;
+        }
+        else
+        {
+            Debug.LogWarning("Player Body not found!");
+        }
 
         if (_rigidbody == null) throw new Exception("Rigidbody of Player not assigned!");
         if (playerInput == null) throw new Exception("Player Input not set!");
@@ -173,7 +169,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         if (interactAction.WasPressedThisFrame()) InteractWithObjects();
         if (jumpAction.WasPressedThisFrame()) jump();
 
-        // Stance switching (Crouch and Prone)
+        // Stance switching
         if (crouchAction.WasPressedThisFrame())
         {
             if (stance == 1) switchStance(0);
@@ -187,13 +183,11 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         }
     }
 
-
     void FixedUpdate()
     {
-        // if input is locked, do not move
         if (isInputLocked)
         {
-            _rigidbody.linearVelocity = Vector3.zero; // 彻底停下
+            _rigidbody.linearVelocity = Vector3.zero;
             return;
         }
 
@@ -212,14 +206,12 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     private IEnumerator RespawnRoutine()
     {
         isInputLocked = true;
-        Debug.Log("Player detected! Freezing...");
+        Debug.Log("PLAYER LOG: Respawn Sequence Started! Freezing player...");
 
-        // 1. Player isInputLocked
-
-        // 2. wait for 2 seconds
+        // 1. Wait for 2 seconds
         yield return new WaitForSeconds(2f);
 
-        // 3. turn screen black in 1 second
+        // 2. Turn screen black in 1 second
         float timer = 0f;
         while (timer < 1f)
         {
@@ -240,22 +232,23 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             blackScreenImage.color = c;
         }
 
-        // 4. black screen 保持 2 秒
+        // 3. Keep black screen for 2 seconds
         yield return new WaitForSeconds(2f);
 
-        // 5.teleport Player
+        // 4. Teleport Player
         if (startingPoint != null)
         {
+            Debug.Log("PLAYER LOG: Teleporting to Starting Point...");
             transform.position = startingPoint.position;
-            _rigidbody.linearVelocity = Vector3.zero;
+            _rigidbody.linearVelocity = Vector3.zero; // Stop movement
             transform.rotation = startingPoint.rotation;
         }
         else
         {
-            Debug.LogError("Starting Point not assigned in Player script!");
+            Debug.LogError("PLAYER ERROR: Starting Point not assigned in Player script!");
         }
 
-        // 6. turn screen back to normal in 0.5 seconds
+        // 5. Turn screen back to normal
         timer = 0f;
         while (timer < 0.5f)
         {
@@ -269,38 +262,37 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             yield return null;
         }
 
-        // unlock input
+        if (blackScreenImage != null)
+        {
+            Color c = blackScreenImage.color;
+            c.a = 0f;
+            blackScreenImage.color = c;
+        }
+
+        // 6. Unlock input
         isInputLocked = false;
-        Debug.Log("Respawn complete.");
+        Debug.Log("PLAYER LOG: Respawn complete. Input unlocked.");
     }
 
     private void movePlayer()
     {
-        // --- Determine Current Speed Limits and Acceleration ---
-        IsRunning = runAction != null && runAction.IsPressed(); // 更新 IsRunning 属性
-
+        IsRunning = runAction != null && runAction.IsPressed();
         float currentMaxSpeed = IsRunning ? runSpeed : walkSpeed;
         float currentAcceleration = accelerationFactor;
 
-        // --- Movement Application ---
         Vector2 direction = playerInput.actions["Move"].ReadValue<Vector2>().normalized;
-        IsMoving = direction.magnitude > 0.1f; // 更新 IsMoving 属性
+        IsMoving = direction.magnitude > 0.1f;
 
         Vector3 acceleration = transform.right * direction.x * currentAcceleration + transform.forward * direction.y * currentAcceleration;
 
         _rigidbody.AddForce(acceleration, ForceMode.Acceleration);
 
-        // Get the horizontal velocity (X and Z components) without the Y component
         Vector3 horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
-        currentHorizontalSpeed = horizontalVelocity.magnitude; // Monitoring current speed
+        currentHorizontalSpeed = horizontalVelocity.magnitude;
 
-        // Cap the horizontal speed at the max speed
         if (currentHorizontalSpeed > currentMaxSpeed)
         {
-            // Calculate the desired capped horizontal velocity vector
             horizontalVelocity = horizontalVelocity.normalized * currentMaxSpeed;
-
-            // Apply the capped horizontal velocity while preserving the vertical (Y) velocity
             _rigidbody.linearVelocity = new Vector3(horizontalVelocity.x, _rigidbody.linearVelocity.y, horizontalVelocity.z);
         }
     }
@@ -310,7 +302,6 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         RaycastHit hit;
         if (Physics.Raycast(eye.transform.position, eye.transform.TransformDirection(Vector3.forward), out hit, interactiveRange, interactableMask, QueryTriggerInteraction.Ignore))
         {
-
             if (hit.collider.gameObject.tag == "HideSpot")
             {
                 if (isHidden == false)
@@ -321,27 +312,35 @@ public class Player : MonoBehaviour, Interaction.IInteractor
                     Debug.Log("isHidden: " + isHidden);
 
                     Camera mainCamera = GetComponentInChildren<Camera>();
-                    auxiliarCamera.gameObject.SetActive(true);
-                    auxiliarCamera.enabled = true;
-                    mainCamera.enabled = false;
-
-                    auxiliarCamera.GetComponent<AuxiliarCamera>().SetTarget(hideSpotPosition);
+                    if (auxiliarCamera != null)
+                    {
+                        auxiliarCamera.gameObject.SetActive(true);
+                        auxiliarCamera.enabled = true;
+                        auxiliarCamera.GetComponent<AuxiliarCamera>().SetTarget(hideSpotPosition);
+                    }
+                    if (mainCamera != null) mainCamera.enabled = false;
                 }
                 else if (isHidden == true)
                 {
                     isHidden = false;
                     Debug.Log("isHidden: " + isHidden);
                     Camera mainCamera = GetComponentInChildren<Camera>();
-                    mainCamera.enabled = true;
-                    auxiliarCamera.gameObject.SetActive(false);
-                    auxiliarCamera.enabled = false;
+                    if (mainCamera != null) mainCamera.enabled = true;
+                    if (auxiliarCamera != null)
+                    {
+                        auxiliarCamera.gameObject.SetActive(false);
+                        auxiliarCamera.enabled = false;
+                    }
                 }
             }
 
             if (hit.rigidbody)
             {
                 Interaction.IInteractable target = hit.rigidbody.gameObject.GetComponent<Interaction.IInteractable>();
-                ((Interaction.IInteractor)this).Interact((object)target);
+                if (target != null)
+                {
+                    ((Interaction.IInteractor)this).Interact((object)target);
+                }
             }
         }
     }
@@ -364,21 +363,10 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
     private void switchStance(int st)
     {
-
         float targetScale = 1f;
-
-        if (st == 0)
-        {
-            targetScale = 1f;
-        }
-        else if (st == 1)
-        {
-            targetScale = crouchHeightRatio;
-        }
-        else if (st == 2)
-        {
-            targetScale = proneHeightRatio;
-        }
+        if (st == 0) targetScale = 1f;
+        else if (st == 1) targetScale = crouchHeightRatio;
+        else if (st == 2) targetScale = proneHeightRatio;
 
         float oldScale = transform.localScale.y;
         float prevPosY = transform.position.y;
@@ -387,20 +375,17 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
         float scaleDifference = (originalScale.y * targetScale - oldScale) * playerHeight;
         transform.position = new Vector3(transform.position.x, prevPosY + scaleDifference * 0.5f, transform.position.z);
-
         transform.localScale = new Vector3(originalScale.x, originalScale.y * targetScale, originalScale.z);
 
         _rigidbody.isKinematic = false;
-
         stance = st;
     }
 
     public void LateUpdate()
     {
-        if (isHidden)
+        if (isHidden && auxiliarCamera != null)
         {
             auxiliarCamera.transform.position = Vector3.Lerp(transform.position, hideSpotPosition, 5 * Time.deltaTime);
         }
-
     }
 }

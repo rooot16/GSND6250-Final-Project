@@ -8029,13 +8029,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777d5e68055656a45964c7a9f7182bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurretViewDetector
-  viewDistance: 5
+  viewDistance: 10
   viewAngle: 15
   minDetectionTemperature: 34.2
   playerTarget: {fileID: 0}
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   targetLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
