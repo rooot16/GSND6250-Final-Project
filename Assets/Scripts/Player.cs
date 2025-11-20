@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour, Interaction.IInteractor
 {
@@ -37,6 +38,13 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public bool enableProne = false;
     public bool isHidden = false;
     public float jumpForce = 5f;
+
+    // respawn settings
+    [Header("Respawn Settings")]
+    public Transform startingPoint; // StartingPoint
+    public Image blackScreenImage;  // black Image 
+
+    private bool isInputLocked = false;
 
     // Private stuff for tracking state and inputs
     private PlayerInput playerInput;
@@ -96,10 +104,20 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         {
             auxiliarCamera.enabled = false;
         }
+
+        // Set black screen to transparent at start
+        if (blackScreenImage != null)
+        {
+            Color c = blackScreenImage.color;
+            c.a = 0f;
+            blackScreenImage.color = c;
+        }
     }
 
     void Update()
     {
+        if (isInputLocked) return;
+
         if (isHidden)
         {
             if (interactAction.WasPressedThisFrame()) InteractWithObjects();
@@ -138,7 +156,88 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
     void FixedUpdate()
     {
+        // if input is locked, do not move
+        if (isInputLocked)
+        {
+            _rigidbody.linearVelocity = Vector3.zero; // 彻底停下
+            return;
+        }
+
         movePlayer();
+    }
+
+    // turret detected respawn sequence
+    public void TriggerRespawnSequence()
+    {
+        if (!isInputLocked) 
+        {
+            StartCoroutine(RespawnRoutine());
+        }
+    }
+
+    private IEnumerator RespawnRoutine()
+    {
+        isInputLocked = true;
+        Debug.Log("Player detected! Freezing...");
+
+        // 1. Player isInputLocked
+
+        // 2. wait for 2 seconds
+        yield return new WaitForSeconds(2f);
+
+        // 3. turn screen black in 1 second
+        float timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime;
+            if (blackScreenImage != null)
+            {
+                Color c = blackScreenImage.color;
+                c.a = Mathf.Lerp(0f, 1f, timer / 1f);
+                blackScreenImage.color = c;
+            }
+            yield return null;
+        }
+
+        if (blackScreenImage != null)
+        {
+            Color c = blackScreenImage.color;
+            c.a = 1f;
+            blackScreenImage.color = c;
+        }
+
+        // 4. black screen 保持 2 秒
+        yield return new WaitForSeconds(2f);
+
+        // 5.teleport Player
+        if (startingPoint != null)
+        {
+            transform.position = startingPoint.position;
+            _rigidbody.linearVelocity = Vector3.zero;
+            transform.rotation = startingPoint.rotation;
+        }
+        else
+        {
+            Debug.LogError("Starting Point not assigned in Player script!");
+        }
+
+        // 6. turn screen back to normal in 0.5 seconds
+        timer = 0f;
+        while (timer < 0.5f)
+        {
+            timer += Time.deltaTime;
+            if (blackScreenImage != null)
+            {
+                Color c = blackScreenImage.color;
+                c.a = Mathf.Lerp(1f, 0f, timer / 0.5f);
+                blackScreenImage.color = c;
+            }
+            yield return null;
+        }
+
+        // unlock input
+        isInputLocked = false;
+        Debug.Log("Respawn complete.");
     }
 
     private void movePlayer()

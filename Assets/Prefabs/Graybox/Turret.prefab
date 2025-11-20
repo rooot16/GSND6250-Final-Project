@@ -8031,11 +8031,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TurretViewDetector
   viewDistance: 5
   viewAngle: 15
+  minDetectionTemperature: 37
   playerTarget: {fileID: 0}
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   viewMeshRenderer: {fileID: 0}
+  defaultMaterial: {fileID: 2100000, guid: 9adcea418a24ac343820606ed30ccfe6, type: 2}
+  detectedMaterial: {fileID: 2100000, guid: c84f6b960f410eb43b0239fded5ec21b, type: 2}
 --- !u!1 &8326532457507595285
 GameObject:
   m_ObjectHideFlags: 0

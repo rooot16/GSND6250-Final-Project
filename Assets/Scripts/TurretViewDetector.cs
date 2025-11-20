@@ -3,86 +3,172 @@
 public class TurretViewDetector : MonoBehaviour
 {
     [Header("View Settings")]
-    [Tooltip("The max distance the turret can see.")]
     public float viewDistance = 15f;
-
-    [Tooltip("The half-angle of the cone. E.g., 45 degrees means a total view angle of 90 degrees.")]
     [Range(0, 180)]
     public float viewAngle = 45f;
 
-    [Header("Target and Obstacles")]
-    [SerializeField]
-    private Transform playerTarget;
+    [Header("Detection Thresholds")]
+    [Tooltip("Player temperature must be ABOVE this value to be detected.")]
+    public float minDetectionTemperature = 36.5f; // lower threshold for detection
 
-    [Tooltip("Layers the raycast should hit to check for walls and obstacles.")]
+    [Header("Target References")]
+    [SerializeField] private Transform playerTarget;
     public LayerMask obstacleMask;
 
-    private bool isPlayerVisible = false;
+    // zombie detection layer
+    public LayerMask targetLayerMask = ~0; // default to everything
 
     [Header("Visualization")]
-    [Tooltip("The Mesh Renderer component on the ViewConeMesh child object.")]
     public MeshRenderer viewMeshRenderer;
-
     private ConeMeshGenerator meshGenerator;
+
+    private PlayerTemperature playerTempScript;
+    private Player playerScript;
+
+    [Header("Detection Materials")]
+    [Tooltip("The material to use when the player is NOT detected.")]
+    public Material defaultMaterial;
+    [Tooltip("The material to use when the player IS detected.")]
+    public Material detectedMaterial;
 
 
     void Awake()
     {
-        // Try to find the player with the "Player" tag
         GameObject playerObject = GameObject.FindWithTag("Player");
-
         if (playerObject != null)
         {
             playerTarget = playerObject.transform;
-        }
-        else
-        {
-            Debug.LogError("Error: Can't find an object with the 'Player' tag! Make sure your player has the correct tag.");
+            playerTempScript = playerObject.GetComponent<PlayerTemperature>();
+            playerScript = playerObject.GetComponent<Player>();
         }
 
-        // Get the ConeMeshGenerator component from a child object
         meshGenerator = GetComponentInChildren<ConeMeshGenerator>();
-        if (meshGenerator == null)
-        {
-            Debug.LogError("Error: ConeMeshGenerator component not found on a child object!");
-        }
-
-        // Set the mesh renderer state.
-        if (viewMeshRenderer != null)
-        {
-            viewMeshRenderer.enabled = false; // Keep the mesh hidden by default.
-        }
+        if (viewMeshRenderer != null) viewMeshRenderer.enabled = false;
     }
 
     void Start()
     {
-        // Set the mesh size to match our view settings.
         UpdateViewMeshSize();
-        if (viewMeshRenderer != null)
+
+        // 初始化材质
+        if (viewMeshRenderer != null && defaultMaterial != null)
         {
-            // Create a unique material instance so changing the color here only affects this turret.
-            viewMeshRenderer.material = new Material(viewMeshRenderer.material);
+            viewMeshRenderer.material = defaultMaterial;
         }
     }
 
     void Update()
     {
-        if (playerTarget == null)
-        {
-            return;
-        }
+        // 1. Player
+        CheckPlayerLogic();
 
-        isPlayerVisible = CheckForPlayer();
+        // 2. Zombies
+        CheckZombieLogic();
 
-        // Control the mesh visibility
+        // 可视化网格颜色控制
+        bool isPlayerSeen = IsTargetVisible(playerTarget) && IsPlayerHotEnough();
+
         if (viewMeshRenderer != null)
         {
-            viewMeshRenderer.enabled = true; // Always show the view mesh while active.
+            viewMeshRenderer.enabled = true;
 
-            // Change the mesh color based on detection status (Red if seen, Yellow if not).
-            Color targetColor = isPlayerVisible ? Color.red : new Color(1f, 1f, 0f, 0.2f); // Yellow and transparent
-            viewMeshRenderer.material.color = Color.Lerp(viewMeshRenderer.material.color, targetColor, Time.deltaTime * 5f);
+            if (isPlayerSeen)
+            {
+                // 如果检测到 Player
+                if (detectedMaterial != null && viewMeshRenderer.material != detectedMaterial)
+                {
+                    viewMeshRenderer.material = detectedMaterial;
+                }
+            }
+            else
+            {
+                // 如果未检测到 Player
+                if (defaultMaterial != null && viewMeshRenderer.material != defaultMaterial)
+                {
+                    viewMeshRenderer.material = defaultMaterial;
+                }
+            }
+
+            Color targetColor = isPlayerSeen ? Color.red : new Color(1f, 1f, 0f, 0.2f);
+            if (viewMeshRenderer.material != null && viewMeshRenderer.material.HasProperty("_Color"))
+            {
+                viewMeshRenderer.material.color = Color.Lerp(viewMeshRenderer.material.color, targetColor, Time.deltaTime * 5f);
+            }
         }
+    }
+
+    private void CheckPlayerLogic()
+    {
+        if (playerTarget == null) return;
+
+        if (IsTargetVisible(playerTarget))
+        {
+            if (IsPlayerHotEnough())
+            {
+                // activate respawn sequence
+                if (playerScript != null)
+                {
+                    playerScript.TriggerRespawnSequence();
+                }
+            }
+        }
+    }
+
+    private void CheckZombieLogic()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, viewDistance, targetLayerMask);
+
+        foreach (var hit in hits)
+        {
+            // 3. zombie
+            if (hit.CompareTag("Zombie"))
+            {
+                // in detection range, now check visibility
+                if (IsTargetVisible(hit.transform))
+                {
+                    ZombieMono zombie = hit.GetComponent<ZombieMono>();
+                    if (zombie != null)
+                    {
+                        zombie.FreezeAndDie();
+                    }
+                }
+            }
+        }
+    }
+
+    private bool IsPlayerHotEnough()
+    {
+        if (playerTempScript == null) return false;
+        return playerTempScript.GetCurrentTemperature() > minDetectionTemperature;
+    }
+
+    // determine if a target is visible based on distance, angle, and obstacles
+    private bool IsTargetVisible(Transform target)
+    {
+        if (target == null) return false;
+
+        Vector3 targetPosition = target.position;
+        Vector3 myPosition = transform.position;
+        Vector3 targetDirection = (targetPosition - myPosition).normalized;
+        float distanceToTarget = Vector3.Distance(myPosition, targetPosition);
+
+        if (distanceToTarget > viewDistance) return false;
+
+
+        float angleToTarget = Vector3.Angle(transform.forward, targetDirection);
+        if (angleToTarget > viewAngle) return false;
+
+        // cover obstacles
+        RaycastHit hit;
+        if (Physics.Raycast(myPosition, targetDirection, out hit, distanceToTarget * 0.99f, obstacleMask))
+        {
+            if (hit.transform != target)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// Updates the mesh's size and shape based on the script's view settings.
@@ -100,45 +186,21 @@ public class TurretViewDetector : MonoBehaviour
         }
     }
 
-    // The main function: checks if the player is in range, in view, and not blocked.
+    // This function is kept for completeness, assuming CheckPlayerLogic is the main flow.
     private bool CheckForPlayer()
     {
         if (playerTarget == null) return false;
-
-        Vector3 targetPosition = playerTarget.position;
-        Vector3 myPosition = transform.position;
-        Vector3 targetDirection = (targetPosition - myPosition).normalized;
-        float distanceToTarget = Vector3.Distance(myPosition, targetPosition);
-
-        // 1. Check the distance first.
-        if (distanceToTarget > viewDistance) return false;
-
-        // 2. Check the angle (Are they inside the cone?).
-        float angleToTarget = Vector3.Angle(transform.forward, targetDirection);
-        if (angleToTarget > viewAngle) return false;
-
-        // 3. Check for obstacles blocking the view (Raycast).
-        RaycastHit hit;
-        // Raycast from the turret to the target, only checking the obstacle layers.
-        if (Physics.Raycast(myPosition, targetDirection, out hit, distanceToTarget, obstacleMask))
-        {
-            // If the ray hits something before the target (since we only check ObstacleMask),
-            // it means the target is blocked.
-            if (hit.collider.gameObject != playerTarget.gameObject)
-            {
-                return false; // View is blocked by an obstacle.
-            }
-        }
-
-        return true; // The player is visible!
+        return IsTargetVisible(playerTarget);
     }
 
-        // Gizmos for visualization
+    // Gizmos for visualization
     private void OnDrawGizmosSelected()
     {
         if (playerTarget == null) return;
 
-        Gizmos.color = isPlayerVisible ? Color.red : Color.yellow;
+        bool isDetected = IsTargetVisible(playerTarget) && IsPlayerHotEnough();
+        Gizmos.color = isDetected ? Color.red : Color.yellow;
+
         Vector3 position = transform.position;
 
         // 1. Draw the edge lines of the view cone.
@@ -155,7 +217,7 @@ public class TurretViewDetector : MonoBehaviour
         DrawWireArc(position, transform.forward, viewDistance, viewAngle * 2);
 
         // 3. Draw a line to the target if they are seen.
-        if (isPlayerVisible)
+        if (isDetected)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(position, playerTarget.position);
