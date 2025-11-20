@@ -1535,6 +1535,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4719673816495005475}
+  - component: {fileID: 3286050335268118978}
+  - component: {fileID: 180623415409127896}
   m_Layer: 0
   m_Name: ZombieGraybox
   m_TagString: Untagged
@@ -1562,8 +1564,45 @@ Transform:
   - {fileID: 2233898231602144194}
   - {fileID: 2982189604540031763}
   - {fileID: 6586206024621904255}
+  - {fileID: 6914000996807471337}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -345.15, z: 0}
+--- !u!195 &3286050335268118978
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897786429879948370}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 2
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &180623415409127896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897786429879948370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2342ea27cc44c4d8f055d630f76806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectorObj: {fileID: 2078919221364309855}
+  target: {fileID: 0}
 --- !u!1 &968117165816396023
 GameObject:
   m_ObjectHideFlags: 0
@@ -3090,6 +3129,72 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 968117165816396023}
   m_Mesh: {fileID: 0}
+--- !u!1 &2078919221364309855
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6914000996807471337}
+  - component: {fileID: 2168614284634787456}
+  - component: {fileID: 5937559186897072799}
+  m_Layer: 0
+  m_Name: PlayerDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6914000996807471337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078919221364309855}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4719673816495005475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &2168614284634787456
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078919221364309855}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 6.88
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5937559186897072799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078919221364309855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 619fae3c97182b147adb0c51589e2f24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2851005386616915311
 GameObject:
   m_ObjectHideFlags: 0
