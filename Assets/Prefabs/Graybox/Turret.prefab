@@ -8029,9 +8029,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777d5e68055656a45964c7a9f7182bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurretViewDetector
-  viewDistance: 10
+  viewDistance: 5
   viewAngle: 15
-  minDetectionTemperature: 34.2
+  minDetectionTemperature: 37
   playerTarget: {fileID: 0}
   obstacleMask:
     serializedVersion: 2
