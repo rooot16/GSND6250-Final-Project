@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerTemperature : MonoBehaviour
+public class PlayerTemperature : MonoBehaviour, IResettable
 {
     // --- Inspector Settings ---
     [Header("Temperature Monitoring")]
@@ -83,5 +83,9 @@ public class PlayerTemperature : MonoBehaviour
     public float GetCurrentTemperature()
     {
         return currentTemperature;
+    }
+
+    public void OnReset() {
+        currentTemperature = minTemperature;
     }
 }

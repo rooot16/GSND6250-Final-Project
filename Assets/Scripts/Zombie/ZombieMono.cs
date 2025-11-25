@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
-public class ZombieMono : MonoBehaviour
+public class ZombieMono : MonoBehaviour, IResettable
 {
     NavMeshAgent navAgent;
     public GameObject detectorObj;
@@ -11,10 +11,13 @@ public class ZombieMono : MonoBehaviour
     public GameObject target = null;
 
     private bool isDead = false;
+    
+    private Vector3 startingLoc;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        startingLoc = transform.position;
         navAgent = GetComponent<NavMeshAgent>();
         if(detectorObj != null) detector = detectorObj.GetComponent<Detector>();
     }
@@ -24,8 +27,8 @@ public class ZombieMono : MonoBehaviour
     {
         if (isDead) return;
 
-        if (target == null) target = detector.target;
-        if(target != null)  navAgent.destination = target.transform.position;
+        if (target == null && navAgent.enabled) target = detector.target;
+        if(target != null && navAgent.enabled)  navAgent.destination = target.transform.position;
     }
 
     public void FreezeAndDie()
@@ -47,4 +50,27 @@ public class ZombieMono : MonoBehaviour
         // 2. destroy after 5 seconds
         Destroy(gameObject, 5f);
     }
+
+    public void OnReset() {
+        if(navAgent.enabled) navAgent.isStopped = true;
+        navAgent.enabled = false;
+        transform.position = startingLoc;
+        detector.clearTarget();
+        target = null;
+        //navAgent.ResetPath();
+        navAgent.enabled = true;
+        navAgent.isStopped = false;
+       
+    }
+
+    public void OnCollisionEnter(Collision collision) {
+        if(collision.collider.tag == "Player") {
+            navAgent.isStopped = true;
+            navAgent.enabled = false;
+            Player player = collision.rigidbody.gameObject.GetComponent<Player>();
+            player.TriggerRespawnSequence();
+        }
+    }
 }
+
+

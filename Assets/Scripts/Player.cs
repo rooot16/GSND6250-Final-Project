@@ -205,6 +205,9 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
     private IEnumerator RespawnRoutine()
     {
+        IsRunning = false;
+        IsMoving = false;
+
         isInputLocked = true;
         Debug.Log("PLAYER LOG: Respawn Sequence Started! Freezing player...");
 
@@ -232,6 +235,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             blackScreenImage.color = c;
         }
 
+        GameManager.ResetLevel();
         // 3. Keep black screen for 2 seconds
         yield return new WaitForSeconds(2f);
 

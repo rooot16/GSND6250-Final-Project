@@ -5,10 +5,13 @@ public class Detector : MonoBehaviour
     public GameObject target => _target;
     GameObject _target = null;
 
+    public void clearTarget() {
+        _target = null;
+    }
+    
     void OnTriggerEnter(Collider collider) {
         if(collider.gameObject.tag == "Player") {
             _target = collider.gameObject;
-            Debug.Log("Yee");
         }
     }
 
