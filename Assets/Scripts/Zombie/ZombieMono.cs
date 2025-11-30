@@ -13,6 +13,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     private bool isDead = false;
     
     private Vector3 startingLoc;
+    private Animator animator;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,6 +21,8 @@ public class ZombieMono : MonoBehaviour, IResettable
         startingLoc = transform.position;
         navAgent = GetComponent<NavMeshAgent>();
         if(detectorObj != null) detector = detectorObj.GetComponent<Detector>();
+
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -27,8 +30,18 @@ public class ZombieMono : MonoBehaviour, IResettable
     {
         if (isDead) return;
 
-        if (target == null && navAgent.enabled) target = detector.target;
-        if(target != null && navAgent.enabled)  navAgent.destination = target.transform.position;
+        if (target == null && navAgent.enabled) {
+            if(target == null && detector.target != null) {
+                animator.SetTrigger("Alerted");
+            }
+            
+            target = detector.target;
+        }
+            
+        if(target != null && navAgent.enabled) {   
+            animator.SetFloat("WalkRunBlend", navAgent.velocity.magnitude / navAgent.speed);
+            navAgent.destination = target.transform.position;
+        }
     }
 
     public void FreezeAndDie()
@@ -57,6 +70,7 @@ public class ZombieMono : MonoBehaviour, IResettable
         transform.position = startingLoc;
         detector.clearTarget();
         target = null;
+        animator.SetTrigger("Reset");
         //navAgent.ResetPath();
         navAgent.enabled = true;
         navAgent.isStopped = false;
