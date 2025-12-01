@@ -95,15 +95,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "IcePack",
-                    "type": "Button",
-                    "id": "c0faa56e-63d6-4a2e-8903-14e3ccb73ad8",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -489,17 +480,6 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Prone",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c6ad03fa-d69d-490a-8938-4edb5271b0ec",
-                    "path": "<Keyboard>/i",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "IcePack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

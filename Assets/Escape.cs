@@ -12,12 +12,14 @@ public class Escape : MonoBehaviour, Interaction.IInteractable
 
     IEnumerator FadeToBlack()
     {
-        while (blackScreen.color.a < 100)
+        while (blackScreen.color.a < 1f)
         {
-            blackScreen.color = new Color(blackScreen.color.r, blackScreen.color.g, blackScreen.color.b, blackScreen.color.a + fadeSpeed);
-            yield return new WaitForEndOfFrame();
+            Color c = blackScreen.color;
+            c.a += fadeSpeed; 
+            blackScreen.color = c;
+            yield return null; 
         }
-        yield return null;
+        ;
     }
 
     void Interaction.IInteractable.OnInteract(Interaction.IInteractor interactor)
@@ -25,4 +27,19 @@ public class Escape : MonoBehaviour, Interaction.IInteractable
         Debug.Log("Interacted with");
         StartCoroutine(FadeToBlack());
     }
+
+    public void OnInteract(Interaction.IInteractor interactor)
+    {
+        Debug.Log("Player Escaped! Level Complete.");
+        if (blackScreen != null)
+        {
+            StartCoroutine(FadeToBlack());
+        }
+    }
+
+    public string GetDescription()
+    {
+        return "Escape / Finish Level"; 
+    }
+
 }

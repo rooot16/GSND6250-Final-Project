@@ -26,7 +26,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public bool IsRunning { get; private set; } = false;
 
     // General settings
-    public float interactiveRange = 5f;
+    public float interactiveRange = 2f;
     public bool enableJump = false;
     public bool enableCrouch = false;
     public bool enableProne = false;
@@ -320,7 +320,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
                     {
                         auxiliarCamera.gameObject.SetActive(true);
                         auxiliarCamera.enabled = true;
-                        auxiliarCamera.GetComponent<AuxiliarCamera>().SetTarget(hideSpotPosition);
+                        //auxiliarCamera.GetComponent<AuxiliarCamera>().SetTarget(hideSpotPosition);
                     }
                     if (mainCamera != null) mainCamera.enabled = false;
                 }
