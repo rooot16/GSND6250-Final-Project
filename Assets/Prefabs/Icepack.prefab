@@ -3480,3 +3480,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 049210b14b042c742916125c262de45b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IcePackItem
+  objectName: Press E to Pickup
