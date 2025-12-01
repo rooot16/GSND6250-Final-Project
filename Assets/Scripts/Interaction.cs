@@ -14,7 +14,6 @@ public class Interaction
         }
     }
 
-    // 物品 (IcePack, Escape Door) 实现这个接口
     public interface IInteractable
     {
         // Press E to interact

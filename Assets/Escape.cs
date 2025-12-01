@@ -36,7 +36,6 @@ public class Escape : MonoBehaviour, Interaction.IInteractable
             StartCoroutine(FadeToBlack());
         }
     }
-
     public string GetDescription()
     {
         return "Escape / Finish Level"; 
