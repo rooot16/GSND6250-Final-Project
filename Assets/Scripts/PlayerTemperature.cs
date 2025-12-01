@@ -1,33 +1,58 @@
 using UnityEngine;
 
+/*
+Temperature values:
+1. Boundaries
+Min Temperature With Ice Pack: 34 (The absolute lowest limit achievable with an ice pack)
+Min Temperature: 36 (Normal base body temperature)
+Max Temperature: 38 (Maximum upper limit)
+
+2. Above Normal Baseline (36-38 degrees)
+Standard Run Rate: 0.2 (Rate of temperature rise while running in normal zone)
+Standard Move Rate: 0 (Rate of temperature rise while walking in normal zone)
+Standard Stand Rate: -0.1 (Rate of cooling while standing still in normal zone)
+
+3. below  Normal Baseline (34-36 degrees)
+Cold Run Rate: 0.35 (Running in cold; body generates heat faster to resist the cold)
+Cold Move Rate: 0.15 (Walking in cold; movement starts generating heat now)
+Cold Stand Rate: 0.05 (Standing in cold; body slowly recovers heat back to 36 degrees)
+
+4. Ice Path Effect
+Ice Pack Cooling Power: 0.2 (The strength of the ice pack; this value is subtracted directly from all the rates above)
+*/
+
 public class PlayerTemperature : MonoBehaviour, IResettable
 {
     // --- Inspector Settings ---
-    [Header("Temperature Monitoring")]
+
+    [Header("Current Status")]
     [SerializeField]
     private float currentTemperature = 36f;
 
-    [Header("Boundary and State")]
-    public float minTemperatureWithIcePack = 34f;
-    public float minTemperature = 36f;
-    public float maxTemperature = 38f;
+    [Header("Temperature Boundaries")]
+    public float minTemperatureWithIcePack = 34f; // Baseline with With ice.
+    public float minTemperature = 36f;            // Normal baseline.
+    public float maxTemperature = 38f;            // Up limit.
     public bool isHoldingIcepack = false;
 
-    [Header("Temperature Change Rates (Per Second)")]
-    public float tempChangeStandStill = -0.1f; 
-    public float tempGainMoving = 0f;
-    public float tempGainRunning = 0.2f;
+    [Header("Standard Zone Rates (36-38 degrees)")]
+    public float standardRunRate = 0.2f;
+    public float standardMoveRate = 0f;
+    public float standardStandRate = -0.1f;
 
-    [Header("Icepack Modifier")]
-    public float tempChangeIcepackModifier = -0.2f; 
+    [Header("Cold Zone Rates (34-36 degrees)")]
+    public float coldRunRate = 0.35f;
+    public float coldMoveRate = 0.15f;
+    public float coldStandRate = 0.05f;
 
-    private Player _player; // get the Player script here to check if they're moving/running.
+    [Header("Icepack Power")]
+    public float icePackCoolingPower = 0.2f;
+
+    private Player _player;
 
     void Awake()
     {
         _player = GetComponent<Player>();
-
-        // Start the player at the minimum healthy temp.
         currentTemperature = minTemperature;
     }
 
@@ -38,54 +63,61 @@ public class PlayerTemperature : MonoBehaviour, IResettable
 
     private void updateTemperature()
     {
-        float baseChangePerSecond = 0f;
         bool isMoving = _player.IsMoving;
         bool isRunning = _player.IsRunning;
+        float finalChangeRate = 0f;
 
-        // 1. Calculate the BASE rate (without ice pack).
-        if (!isMoving)
+        // Step 1: Passive Recovery (Standing still, no ice pack).
+        // logic: slowly drift back to 36.0 without jittering.
+        if (!isHoldingIcepack && !isMoving && !isRunning)
         {
-            baseChangePerSecond = tempChangeStandStill;
+            float recoverySpeed = (currentTemperature < 36f) ? coldStandRate : Mathf.Abs(standardStandRate);
+
+            // MoveTowards prevents the value from overshooting 36.
+            currentTemperature = Mathf.MoveTowards(currentTemperature, minTemperature, recoverySpeed * Time.fixedDeltaTime);
+            return;
         }
-        else if (isRunning)
+
+        // Step 2: Active State (Moving, Running, or holding Ice Pack).
+
+        // A. Pick the base rate based on current temp zone.
+        if (currentTemperature < 36f)
         {
-            baseChangePerSecond = tempGainRunning;
+            // Cold Zone Logic (34-36)
+            if (isRunning) finalChangeRate = coldRunRate;
+            else if (isMoving) finalChangeRate = coldMoveRate;
+            else finalChangeRate = coldStandRate; // (Ice pack case)
         }
         else
         {
-            baseChangePerSecond = tempGainMoving;
+            // Standard Zone Logic (36-38)
+            if (isRunning) finalChangeRate = standardRunRate;
+            else if (isMoving) finalChangeRate = standardMoveRate;
+            else finalChangeRate = standardStandRate;
         }
 
-        // 2. Apply the Ice Pack correction (simple addition/subtraction).
-        float finalChangePerSecond = baseChangePerSecond;
-
+        // B. Apply Ice Pack cooling.
         if (isHoldingIcepack)
         {
-            // Apply the fixed modifier to the base rate
-            finalChangePerSecond += tempChangeIcepackModifier;
+            finalChangeRate -= icePackCoolingPower;
         }
 
-        // 3. Apply the change and make sure it stays between min and max.
-        currentTemperature += finalChangePerSecond * Time.fixedDeltaTime;
- 
-        if (isHoldingIcepack)
-        {
-            currentTemperature = Mathf.Clamp(currentTemperature, minTemperatureWithIcePack, maxTemperature);
-        }
-        else
-        {
-            currentTemperature = Mathf.Clamp(currentTemperature, minTemperature, maxTemperature);
-        }
+        // C. Apply the change.
+        currentTemperature += finalChangeRate * Time.fixedDeltaTime;
 
+        // Step 3: Clamp limits.
+        // If holding ice pack, floor is 34. Otherwise, physics technically allows 34, but logic pushes to 36.
+        float absoluteFloor = minTemperatureWithIcePack;
+        currentTemperature = Mathf.Clamp(currentTemperature, absoluteFloor, maxTemperature);
     }
 
-    // for Zombies scripts to check the current temperature.
     public float GetCurrentTemperature()
     {
         return currentTemperature;
     }
 
-    public void OnReset() {
+    public void OnReset()
+    {
         currentTemperature = minTemperature;
     }
 }
