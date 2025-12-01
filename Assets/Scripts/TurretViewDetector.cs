@@ -208,7 +208,8 @@ public class TurretViewDetector : MonoBehaviour
             {
                 if (IsTargetVisible(hit.transform))
                 {
-
+                    ZombieMono zombieScript = hit.gameObject.GetComponent<ZombieMono>();
+                    if(zombieScript != null) zombieScript.FreezeAndDie();
                 }
             }
         }

@@ -10,9 +10,11 @@ public class ZombieMono : MonoBehaviour, IResettable
 
     public GameObject target = null;
 
+
     private bool isDead = false;
     
     private Vector3 startingLoc;
+    private Animator animator;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,6 +22,8 @@ public class ZombieMono : MonoBehaviour, IResettable
         startingLoc = transform.position;
         navAgent = GetComponent<NavMeshAgent>();
         if(detectorObj != null) detector = detectorObj.GetComponent<Detector>();
+
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -27,8 +31,18 @@ public class ZombieMono : MonoBehaviour, IResettable
     {
         if (isDead) return;
 
-        if (target == null && navAgent.enabled) target = detector.target;
-        if(target != null && navAgent.enabled)  navAgent.destination = target.transform.position;
+        if (target == null && navAgent.enabled) {
+            if(target == null && detector.target != null) {
+                animator.SetTrigger("Alerted");
+            }
+            
+            target = detector.target;
+        }
+            
+        if(target != null && navAgent.enabled) {   
+            animator.SetFloat("WalkRunBlend", navAgent.velocity.magnitude / navAgent.speed);
+            navAgent.destination = target.transform.position;
+        }
     }
 
     public void FreezeAndDie()
@@ -41,32 +55,43 @@ public class ZombieMono : MonoBehaviour, IResettable
         {
             navAgent.isStopped = true;
             navAgent.velocity = Vector3.zero;
-            navAgent.enabled = false;
+            navAgent.ResetPath();
         }
 
+        animator.SetTrigger("Dead");
+
         // Animator
-        Debug.Log("Zombie detected! Destroying in 5s...");
+        //Debug.Log("Zombie detected! Destroying in 5s...");
 
         // 2. destroy after 5 seconds
-        Destroy(gameObject, 5f);
+        //Destroy(gameObject, 5f);
+
+
     }
 
     public void OnReset() {
-        if(navAgent.enabled) navAgent.isStopped = true;
-        navAgent.enabled = false;
+        if(navAgent.enabled) {
+            navAgent.isStopped = true;
+            navAgent.velocity = Vector3.zero;
+            navAgent.ResetPath();
+        }
+
         transform.position = startingLoc;
         detector.clearTarget();
         target = null;
-        //navAgent.ResetPath();
-        navAgent.enabled = true;
+        isDead = false;
+        animator.SetTrigger("Reset");
+        
+        
+
         navAgent.isStopped = false;
        
     }
 
     public void OnCollisionEnter(Collision collision) {
-        if(collision.collider.tag == "Player") {
-            navAgent.isStopped = true;
-            navAgent.enabled = false;
+        if(collision.collider.tag == "Player" && !isDead) {
+            if(navAgent.enabled) navAgent.isStopped = true;
+
             Player player = collision.rigidbody.gameObject.GetComponent<Player>();
             player.TriggerRespawnSequence();
         }
