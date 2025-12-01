@@ -22,7 +22,7 @@ public class InteractionUI : MonoBehaviour
         if (playerCameraEye == null) return;
 
         RaycastHit hit;
- 
+
         if (Physics.Raycast(playerCameraEye.position, playerCameraEye.forward, out hit, detectRange, interactableLayer))
         {
             Interaction.IInteractable interactable = null;
@@ -33,12 +33,11 @@ public class InteractionUI : MonoBehaviour
             }
             else
             {
-                 interactable = hit.collider.GetComponent<Interaction.IInteractable>();
+                interactable = hit.collider.GetComponent<Interaction.IInteractable>();
             }
 
             if (interactable != null)
             {
-                // Display UI
                 ShowPrompt(interactable.GetDescription());
             }
             else
@@ -55,7 +54,7 @@ public class InteractionUI : MonoBehaviour
     void ShowPrompt(string message)
     {
         if (uiPanel != null) uiPanel.SetActive(true);
-        if (promptText != null) promptText.text = message + "\n[E]";
+        if (promptText != null) promptText.text = message;
     }
 
     void HidePrompt()
