@@ -17,6 +17,16 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: CameraBase
+    second: {fileID: 2100000, guid: 34692e36a897df44caa6a1bfbec0bef9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CameraLight
+    second: {fileID: 2100000, guid: 2d00d7039e38d2046abd4f37172b4bb2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Chamber
     second: {fileID: 2100000, guid: 99322aefef8e61d4ea71433ef3bf1815, type: 2}
   - first:
@@ -29,6 +39,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Cover
     second: {fileID: 2100000, guid: b573cf139b155f941853a3dacf14d53b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CoverInner
+    second: {fileID: 2100000, guid: 4943a562c8138a942bd710e661c9e8b9, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -48,27 +63,27 @@ ModelImporter:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: BakedCover
-    second: {fileID: 2800000, guid: ae18a9eae117cdf46bf76714640df4db, type: 3}
+    second: {fileID: 2800000, guid: 51c8b320f65dd2c49830cda1f8ef144f, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: BakedLogo
-    second: {fileID: 2800000, guid: a3373972cba9c474d92049bed4026049, type: 3}
+    second: {fileID: 2800000, guid: dec4ca4cf03ebd34a9d2affd62c27517, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: BakedMotorNormal
-    second: {fileID: 2800000, guid: be56964ff477be1409aa9c0465004d1e, type: 3}
+    second: {fileID: 2800000, guid: 937931da3f4be354fbbc5005117bbb1a, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: rusty_metal_04_diff_1k
-    second: {fileID: 2800000, guid: 4551e844b6e1b03469a48a6350ab6f3f, type: 3}
+    second: {fileID: 2800000, guid: bbdb67682ddac31499df470efdf3e6eb, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: rusty_metal_04_nor_dx_1k
-    second: {fileID: 2800000, guid: e86debbc6f52b1d4f958701a1e1167bd, type: 3}
+    second: {fileID: 2800000, guid: 602d0eb79271f27429b3c0409a8924d3, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
