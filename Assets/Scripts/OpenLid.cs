@@ -14,7 +14,6 @@ public class OpenLid : MonoBehaviour
     {
         closedRot = transform.localRotation;
 
-        // Rotate ONLY around local Y, applied to original rotation
         openRot = closedRot * Quaternion.AngleAxis(openAngle, Vector3.up);
     }
 
@@ -22,12 +21,10 @@ public class OpenLid : MonoBehaviour
     {
         Quaternion target = isOpen ? openRot : closedRot;
 
-        // Smooth rotation - NO EULERS INVOLVED
         transform.localRotation =
             Quaternion.Slerp(transform.localRotation, target, Time.deltaTime * openSpeed);
     }
 
-    // Call this from a button, trigger, or event
     public void ToggleLid()
     {
         isOpen = !isOpen;

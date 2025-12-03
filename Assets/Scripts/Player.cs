@@ -35,6 +35,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     public bool enableProne = false;
     public bool isHidden = false;
     public float jumpForce = 5f;
+    public float currentTemperature;
 
     // respawn settings
     [Header("Respawn Settings")]
@@ -44,6 +45,12 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     [Header("Turret Detection Status")]
     [SerializeField]
     private int turretsSeeingMe = 0;
+
+    [Header("Audio Components")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip sfx_dead;
+    [SerializeField] private AudioSource audioSource_agitated;
+    [SerializeField] private AudioSource audioSource_heartbeat;
 
     public bool IsVisibleToTurret
     {
@@ -80,6 +87,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     private Vector3 hideSpotPosition;
 
     public Camera auxiliarCamera;
+    public PlayerTemperature playerTemperature;
 
     [SerializeField] GameObject eye;
 
@@ -97,6 +105,10 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
         _rigidbody = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
+        playerTemperature = GetComponent<PlayerTemperature>();
+
+        audioSource_agitated.enabled = false;
+        audioSource_heartbeat.enabled = false;
 
         if (transform.Find("Body") != null)
         {
@@ -156,6 +168,8 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             if (stance == 2) switchStance(0);
             else if (enableProne) switchStance(2);
         }
+
+        PlayHighTemperatureSFX();
     }
 
     void FixedUpdate()
@@ -170,6 +184,12 @@ public class Player : MonoBehaviour, Interaction.IInteractor
 
     public void TriggerRespawnSequence()
     {
+        if(audioSource != null && sfx_dead != null)
+        {
+            audioSource.clip = sfx_dead;
+            audioSource.Play();
+        }
+
         if (!isInputLocked) StartCoroutine(RespawnRoutine());
     }
 
@@ -339,6 +359,34 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         if (isHidden && auxiliarCamera != null)
         {
             auxiliarCamera.transform.position = Vector3.Lerp(transform.position, hideSpotPosition, 5 * Time.deltaTime);
+        }
+    }
+
+    public void PlayHighTemperatureSFX()
+    {
+        currentTemperature = playerTemperature.GetCurrentTemperature();
+
+        if (currentTemperature >= 37f)
+        {
+            if (audioSource_agitated != null)
+            {
+                audioSource_agitated.enabled = true;
+            }
+            if (audioSource_heartbeat != null)
+            {
+                audioSource_heartbeat.enabled = true;
+            }
+        }
+        if (currentTemperature < 37f)
+        {
+            if (audioSource_agitated != null)
+            {
+                audioSource_agitated.enabled = false;
+            }
+            if (audioSource_heartbeat != null)
+            {
+                audioSource_heartbeat.enabled = false;
+            }
         }
     }
 }

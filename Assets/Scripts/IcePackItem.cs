@@ -7,6 +7,10 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
     [Header("Interaction Settings")]
     public string objectName = "Pick up Ice Pack";
 
+    [Header("Audio Components")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip sfx_ice;
+
     public async void OnInteract(Interaction.IInteractor interactor)
     {
         MonoBehaviour playerObj = interactor as MonoBehaviour;
@@ -29,6 +33,10 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
                     if (controller != null)
                     {
                         controller.ActivateIcePack();
+                        if (audioSource != null && sfx_ice != null)
+                        {
+                            audioSource.PlayOneShot(sfx_ice);
+                        }
                         parentScript.ToggleLid();
                         Destroy(gameObject);
 

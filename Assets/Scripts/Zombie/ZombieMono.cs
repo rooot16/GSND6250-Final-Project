@@ -12,6 +12,7 @@ public class ZombieMono : MonoBehaviour, IResettable
 
     public AudioSource audioSource;
     public AudioClip zombieDied_SFX;
+    public AudioClip shot_SFX;
 
     private bool isDead = false;
     
@@ -63,10 +64,11 @@ public class ZombieMono : MonoBehaviour, IResettable
             navAgent.ResetPath();
         }
 
-        if (audioSource != null && zombieDied_SFX != null);
+        if (audioSource != null && zombieDied_SFX != null)
         {
             Debug.Log("Zombie AudioSource and Died SFX exists!");
-//            audioSource.clip = zombieDied_SFX;
+            //audioSource.clip = zombieDied_SFX;
+            audioSource.PlayOneShot(shot_SFX);
             audioSource.PlayOneShot(zombieDied_SFX);
         }
         animator.SetTrigger("Dead");
