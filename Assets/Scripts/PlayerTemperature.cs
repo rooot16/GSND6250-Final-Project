@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 /*
 Temperature values:
@@ -47,6 +48,7 @@ public class PlayerTemperature : MonoBehaviour, IResettable
 
     [Header("Icepack Power")]
     public float icePackCoolingPower = 0.2f;
+
 
     private Player _player;
 
@@ -104,6 +106,8 @@ public class PlayerTemperature : MonoBehaviour, IResettable
 
         // C. Apply the change.
         currentTemperature += finalChangeRate * Time.fixedDeltaTime;
+
+
 
         // Step 3: Clamp limits.
         // If holding ice pack, floor is 34. Otherwise, physics technically allows 34, but logic pushes to 36.

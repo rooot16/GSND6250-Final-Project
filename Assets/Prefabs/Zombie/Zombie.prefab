@@ -213,6 +213,7 @@ MonoBehaviour:
   target: {fileID: 0}
   audioSource: {fileID: 1863319170910981913}
   zombieDied_SFX: {fileID: 8300000, guid: cfd14838e6e398d42990c818a753026b, type: 3}
+  shot_SFX: {fileID: 8300000, guid: e5b1e247cf335bb409d73de0c10e4e56, type: 3}
 --- !u!136 &7101744322280666810
 CapsuleCollider:
   m_ObjectHideFlags: 0
