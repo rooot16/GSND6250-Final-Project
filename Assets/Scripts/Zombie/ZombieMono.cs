@@ -10,11 +10,14 @@ public class ZombieMono : MonoBehaviour, IResettable
 
     public GameObject target = null;
 
+    public AudioSource audioSource;
+    public AudioClip zombieDied_SFX;
 
     private bool isDead = false;
     
     private Vector3 startingLoc;
     private Animator animator;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -44,6 +47,8 @@ public class ZombieMono : MonoBehaviour, IResettable
             navAgent.destination = target.transform.position;
         }
     }
+    
+    public bool GetIsDead() { return isDead; }
 
     public void FreezeAndDie()
     {
@@ -58,7 +63,15 @@ public class ZombieMono : MonoBehaviour, IResettable
             navAgent.ResetPath();
         }
 
+        if (audioSource != null && zombieDied_SFX != null);
+        {
+            Debug.Log("Zombie AudioSource and Died SFX exists!");
+//            audioSource.clip = zombieDied_SFX;
+            audioSource.PlayOneShot(zombieDied_SFX);
+        }
         animator.SetTrigger("Dead");
+
+        //audioSource.enabled = false;
 
         // Animator
         //Debug.Log("Zombie detected! Destroying in 5s...");
