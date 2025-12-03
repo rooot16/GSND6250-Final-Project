@@ -1,0 +1,35 @@
+using UnityEngine;
+
+public class OpenLid : MonoBehaviour
+{
+    [Header("Lid Settings")]
+    public float openAngle = -90f;        // How much to rotate on Y
+    public float openSpeed = 2f;         // How fast the lid opens
+    public bool isOpen = false;          // Toggle
+
+    private Quaternion closedRot;
+    private Quaternion openRot;
+
+    void Start()
+    {
+        closedRot = transform.localRotation;
+
+        // Rotate ONLY around local Y, applied to original rotation
+        openRot = closedRot * Quaternion.AngleAxis(openAngle, Vector3.up);
+    }
+
+    void Update()
+    {
+        Quaternion target = isOpen ? openRot : closedRot;
+
+        // Smooth rotation - NO EULERS INVOLVED
+        transform.localRotation =
+            Quaternion.Slerp(transform.localRotation, target, Time.deltaTime * openSpeed);
+    }
+
+    // Call this from a button, trigger, or event
+    public void ToggleLid()
+    {
+        isOpen = !isOpen;
+    }
+}
