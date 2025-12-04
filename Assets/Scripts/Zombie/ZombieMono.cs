@@ -18,7 +18,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     
     private Vector3 startingLoc;
     private Animator animator;
-
+    private Collider collider;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -28,6 +28,7 @@ public class ZombieMono : MonoBehaviour, IResettable
         if(detectorObj != null) detector = detectorObj.GetComponent<Detector>();
 
         animator = GetComponent<Animator>();
+        collider = GetComponent<Collider>();
     }
 
     // Update is called once per frame
@@ -72,7 +73,7 @@ public class ZombieMono : MonoBehaviour, IResettable
             audioSource.PlayOneShot(zombieDied_SFX);
         }
         animator.SetTrigger("Dead");
-
+        collider.enabled = false;
         //audioSource.enabled = false;
 
         // Animator
@@ -95,6 +96,7 @@ public class ZombieMono : MonoBehaviour, IResettable
         detector.clearTarget();
         target = null;
         isDead = false;
+        collider.enabled = true;
         animator.SetTrigger("Reset");
         
         
