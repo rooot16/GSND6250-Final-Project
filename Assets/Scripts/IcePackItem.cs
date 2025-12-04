@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class IcePackItem : MonoBehaviour, Interaction.IInteractable
 {
@@ -14,6 +15,7 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
     public async void OnInteract(Interaction.IInteractor interactor)
     {
         MonoBehaviour playerObj = interactor as MonoBehaviour;
+        IcePackController controller = playerObj.GetComponent<IcePackController>();
 
         Transform parentTransform = transform.parent;
 
@@ -29,7 +31,6 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
 
                 if (playerObj != null)
                 {
-                    IcePackController controller = playerObj.GetComponent<IcePackController>();
                     if (controller != null)
                     {
                         controller.ActivateIcePack();
@@ -48,6 +49,20 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
                 Debug.LogWarning("ParentScriptType not found on the parent GameObject.");
             }
         }
+        else
+        {
+            if (controller != null)
+            {
+                controller.ActivateIcePack();
+                if (audioSource != null && sfx_ice != null)
+                {
+                    audioSource.PlayOneShot(sfx_ice);
+                }
+                Destroy(gameObject);
+
+            }
+        }
+
     }
 
     public string GetDescription()
