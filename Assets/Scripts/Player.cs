@@ -52,6 +52,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
     [SerializeField] private AudioSource audioSource_agitated;
     [SerializeField] private AudioSource audioSource_heartbeat;
 
+    bool onStair;
     public bool IsVisibleToTurret
     {
         get { return turretsSeeingMe > 0; }
@@ -258,6 +259,12 @@ public class Player : MonoBehaviour, Interaction.IInteractor
         Vector3 acceleration = transform.right * direction.x * currentAcceleration + transform.forward * direction.y * currentAcceleration;
         _rigidbody.AddForce(acceleration, ForceMode.Acceleration);
 
+        if (onStair && IsMoving)
+        {
+            _rigidbody.linearDamping = 0;
+            _rigidbody.AddForce(Vector3.up * 10, ForceMode.Acceleration);
+        }
+
         Vector3 horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
         currentHorizontalSpeed = horizontalVelocity.magnitude;
 
@@ -266,7 +273,43 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             horizontalVelocity = horizontalVelocity.normalized * currentMaxSpeed;
             _rigidbody.linearVelocity = new Vector3(horizontalVelocity.x, _rigidbody.linearVelocity.y, horizontalVelocity.z);
         }
+
+        if (!onStair)
+        {
+            _rigidbody.linearDamping = 0;
+        }
+        if (onStair && !IsMoving)
+        {
+            _rigidbody.linearDamping = 100;
+            _rigidbody.linearVelocity = new Vector3(_rigidbody.linearVelocity.x, 0, _rigidbody.linearVelocity.z);
+        }
     }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (!collision.collider.CompareTag("Stair"))
+        {
+            return;
+        }
+
+        if (collision.contacts[0].normal.y <= 0.1f)
+        {
+            return;
+        }
+
+        onStair = true;
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (!collision.collider.CompareTag("Stair"))
+        {
+            return;
+        }
+        _rigidbody.linearVelocity = new Vector3(_rigidbody.linearVelocity.x, 0, _rigidbody.linearVelocity.z);
+        onStair = false;
+    }
+
+
 
     private void InteractWithObjects()
     {
