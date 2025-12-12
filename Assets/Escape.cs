@@ -21,16 +21,21 @@ public class Escape : MonoBehaviour, Interaction.IInteractable
         }
         ;
     }
-
+    /*
     void Interaction.IInteractable.OnInteract(Interaction.IInteractor interactor)
     {
         Debug.Log("Interacted with");
         StartCoroutine(FadeToBlack());
-    }
+    }*/
 
     public void OnInteract(Interaction.IInteractor interactor)
     {
         Debug.Log("Player Escaped! Level Complete.");
+        ZombieMono[] objs = GameObject.FindObjectsOfType<ZombieMono>();
+
+        foreach(ZombieMono zb in objs) {
+            zb.StopBehaviour();
+        }
         if (blackScreen != null)
         {
             StartCoroutine(FadeToBlack());

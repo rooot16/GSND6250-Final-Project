@@ -190,7 +190,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             audioSource.clip = sfx_dead;
             audioSource.Play();
         }
-
+        GameManager.PauseGame();
         if (!isInputLocked) StartCoroutine(RespawnRoutine());
     }
 
@@ -218,7 +218,6 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             Color c = blackScreenImage.color; c.a = 1f; blackScreenImage.color = c;
         }
 
-        GameManager.ResetLevel(); // 确保你有这个类，否则注释掉
         yield return new WaitForSeconds(2f);
 
         if (startingPoint != null)
@@ -227,6 +226,7 @@ public class Player : MonoBehaviour, Interaction.IInteractor
             _rigidbody.linearVelocity = Vector3.zero;
             transform.rotation = startingPoint.rotation;
         }
+        GameManager.ResetLevel();
 
         timer = 0f;
         while (timer < 0.5f)

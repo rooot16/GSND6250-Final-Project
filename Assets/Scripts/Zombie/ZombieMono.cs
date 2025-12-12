@@ -15,7 +15,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     public AudioClip shot_SFX;
 
     private bool isDead = false;
-    
+    private bool paused = false;
     private Vector3 startingLoc;
     private Animator animator;
     private Collider collider;
@@ -23,6 +23,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        paused = false;
         startingLoc = transform.position;
         navAgent = GetComponent<NavMeshAgent>();
         if(detectorObj != null) detector = detectorObj.GetComponent<Detector>();
@@ -34,7 +35,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     // Update is called once per frame
     void Update()
     {
-        if (isDead) return;
+        if (isDead || paused) return;
 
         if (target == null && navAgent.enabled) {
             if(target == null && detector.target != null) {
@@ -86,6 +87,7 @@ public class ZombieMono : MonoBehaviour, IResettable
     }
 
     public void OnReset() {
+        paused = false;
         if(navAgent.enabled) {
             navAgent.isStopped = true;
             navAgent.velocity = Vector3.zero;
@@ -112,6 +114,22 @@ public class ZombieMono : MonoBehaviour, IResettable
             Player player = collision.rigidbody.gameObject.GetComponent<Player>();
             player.TriggerRespawnSequence();
         }
+    }
+
+    public void StopBehaviour() {
+        paused = true;
+
+        if(navAgent.enabled) {
+            navAgent.isStopped = true;
+            navAgent.velocity = Vector3.zero;
+            navAgent.ResetPath();
+        }
+        detector.clearTarget();
+        target = null;
+    }
+
+    public void StartBehaviour() {
+        paused = false;
     }
 }
 

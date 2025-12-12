@@ -24,12 +24,16 @@ public class GameManager : MonoBehaviour
 
     public static void ResetLevel() {
         IResettable script;
-        foreach(MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)) {
+        foreach(MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None)) {
             if((script = mb as IResettable) != null) {
                 script.OnReset();
             }
         }
     }
 
-
+    public static void PauseGame() {
+        foreach(ZombieMono zb in FindObjectsByType<ZombieMono>(FindObjectsInactive.Include, FindObjectsSortMode.None)) {
+            zb.StopBehaviour();
+        }
+    }
 }

@@ -39,7 +39,7 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
                             audioSource.PlayOneShot(sfx_ice);
                         }
                         parentScript.ToggleLid();
-                        Destroy(gameObject);
+                        gameObject.SetActive(false);
 
                     }
                 }
@@ -58,7 +58,7 @@ public class IcePackItem : MonoBehaviour, Interaction.IInteractable
                 {
                     audioSource.PlayOneShot(sfx_ice);
                 }
-                Destroy(gameObject);
+                gameObject.SetActive(false);
 
             }
         }
